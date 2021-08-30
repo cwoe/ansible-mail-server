@@ -1,0 +1,1 @@
+certbot certonly --standalone --non-interactive --agree-tos --domains {{ hostname }}{% if addional_ssl_domains is defined %}{% for item in addional_ssl_domains %},{{ item }}{% endfor %}{% endif %} -m root@{{ hostname.split('.')[1:] | join('.') }}

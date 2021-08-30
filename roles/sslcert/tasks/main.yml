@@ -1,0 +1,39 @@
+---
+- name: Install needed packages
+  community.general.pacman:
+    name:
+      - certbot
+    update_cache: yes
+
+- name: Check if a cert already exists
+  stat:
+    path: /etc/letsencrypt/live/{{ hostname }}/privkey.pem
+  register: stat_result
+
+- name: Create cert, if it doesnt exist already
+  shell: "{{ lookup('template', 'certbot-issue.j2') }}"
+  when: not stat_result.stat.exists
+  notify: fix exim permissions
+
+- name: Add dovecot post hook
+  copy:
+    src: 'dovecot.sh'
+    dest: /etc/letsencrypt/renewal-hooks/post/dovecot.sh
+    mode: '755'
+
+- name: Add exim post hook
+  template:
+    src: 'exim.sh.j2'
+    dest: /etc/letsencrypt/renewal-hooks/post/exim.sh
+    mode: '755'
+
+- name: Create Renew Service
+  copy:
+    src: 'certbot-renew.service'
+    dest: /etc/systemd/system/certbot-renew.service
+
+- name: Create Renew Timer
+  copy:
+    src: 'certbot-renew.timer'
+    dest: /etc/systemd/system/certbot-renew.timer
+  notify: start certbot-renew.timer

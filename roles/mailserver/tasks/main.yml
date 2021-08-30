@@ -1,0 +1,109 @@
+---
+- name: Install needed packages
+  community.general.pacman:
+    name:
+      - exim
+      - clamav
+      - spamassassin
+      - dovecot
+      - pigeonhole
+      - gcc
+      - make
+    update_cache: yes
+
+- name: Add clamav user to the exim group
+  user:
+    name: clamav
+    groups: exim
+    append: yes
+
+- name: Fix freshclam service
+  lineinfile:
+    path: /usr/lib/systemd/system/clamav-freshclam.service
+    regexp: '^ExecStart'
+    line: ExecStart=/usr/bin/freshclam -d --foreground=true && systemctl restart clamav-daemon
+
+- name: Start freshclam
+  systemd:
+    name: clamav-freshclam
+    state: started
+    enabled: yes
+
+- name: Check that the dkim exists
+  stat:
+    path: /etc/mail/dkim_rsa.private
+  register: stat_result
+
+- name: Create the dkim
+  shell: openssl genrsa -out /etc/mail/dkim_rsa.private 2048
+  when: not stat_result.stat.exists
+  notify: Create Pubkey
+
+- name: Update exim config
+  template:
+    src: 'exim.conf.j2'
+    dest: /etc/mail/exim.conf
+  notify: start exim
+
+- name: Add exim systemfilter
+  copy:
+    src: 'system.filter'
+    dest: /etc/mail/system.filter
+  notify: start exim
+
+- name: Update clamav config
+  copy:
+    src: 'clamd.conf'
+    dest: /etc/clamav/clamd.conf
+  notify: start clamd
+
+- name: Fix SA perms
+  file:
+    path: /etc/mail/spamassassin/sa-update-keys
+    owner: spamd
+    group: spamd
+    mode: '700'
+    state: directory
+  notify: update SA
+
+- name: Create SA Update Service
+  copy:
+    src: 'sa-update.service'
+    dest: /etc/systemd/system/sa-update.service
+
+- name: Create SA Update Timer
+  copy:
+    src: 'sa-update.timer'
+    dest: /etc/systemd/system/sa-update.timer
+  notify: start sa-update.timer
+
+- name: Create dovecot directory
+  file:
+    path: /etc/dovecot
+    state: directory
+
+- name: Copy dovecot config
+  template:
+    src: 'dovecot.conf.j2'
+    dest: /etc/dovecot/dovecot.conf
+  notify: start dovecot
+
+- name: Add sieve global directory
+  file:
+    path: /var/lib/dovecot/sieve
+    group: dovecot
+    mode: '755'
+    state: directory
+
+- name: Copy sieve config
+  template:
+    src: 'default.sieve'
+    dest: /var/lib/dovecot/sieve/default.sieve
+  notify: compile sieve
+
+- name: Fix privleges for dkim key 
+  ansible.builtin.file:
+    path: /etc/mail/dkim_rsa.private
+    owner: exim
+    mode: '700'
+  when: not stat_result.stat.exists

@@ -1,0 +1,13 @@
+[Unit]
+Description=spamassassin housekeeping stuff
+After=network.target
+
+[Service]
+User=spamd
+Group=spamd
+Type=oneshot
+
+ExecStart=/usr/bin/vendor_perl/sa-update
+SuccessExitStatus=1
+ExecStart=/usr/bin/vendor_perl/sa-compile
+ExecStart=!/usr/bin/systemctl -q --no-block try-restart spamassassin.service

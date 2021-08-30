@@ -1,0 +1,13 @@
+---
+- name: apply iptables
+  shell: iptables-restore < /etc/iptables/iptables.rules
+
+- name: apply ip6tables
+  shell: ip6tables-restore < /etc/iptables/ip6tables.rules
+  notify: restart ip6tables
+
+- name: restart ip6tables
+  systemd:
+    name: ip6tables
+    state: restarted
+    enabled: yes

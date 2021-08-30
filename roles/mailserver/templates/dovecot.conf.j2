@@ -1,0 +1,51 @@
+ssl = required
+ssl_cert = </etc/letsencrypt/live/{{ hostname }}/fullchain.pem
+ssl_key = </etc/letsencrypt/live/{{ hostname }}/privkey.pem
+
+auth_mechanisms = plain login
+userdb {
+	driver = passwd
+}
+passdb {
+	driver = pam
+}
+service auth {
+	unix_listener auth-client {
+		mode = 0660
+		user = exim
+	}
+}
+
+mail_location = maildir:/var/mail/%n:INBOX=/var/mail/%n/Inbox:LAYOUT=fs
+namespace inbox {
+	inbox = yes
+	mailbox Drafts {
+	special_use = \Drafts
+	auto = subscribe
+}
+	mailbox Junk {
+	special_use = \Junk
+	auto = subscribe
+	autoexpunge = 30d
+}
+	mailbox Sent {
+	special_use = \Sent
+	auto = subscribe
+}
+	mailbox Trash {
+	special_use = \Trash
+}
+	mailbox Archive {
+	special_use = \Archive
+}
+}
+
+protocols = $protocols imap
+protocol lda {
+	mail_plugins = $mail_plugins sieve
+}
+
+plugin {
+	sieve = ~/mail/.dovecot.sieve
+	sieve_default = /var/lib/dovecot/sieve/default.sieve
+}

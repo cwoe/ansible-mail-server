@@ -1,0 +1,7 @@
+if $h_X-Spam_score matches "^[^-0][0-9\.]+" and ${sg{$h_X-Spam_score:}{\\.}{}} is above 5
+then
+headers add "Old-Subject: $h_subject"
+headers remove "Subject"
+headers add "Subject: *** SPAM ($header_X-Spam_score points) *** $h_old-subject"
+headers remove "Old-Subject"
+endif

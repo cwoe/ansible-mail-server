@@ -1,0 +1,53 @@
+---
+- name: start clamd
+  systemd:
+    name: clamav-daemon
+    state: restarted
+    enabled: yes
+
+- name: start dovecot
+  systemd:
+    name: dovecot
+    state: restarted
+    enabled: yes
+
+- name: start sa-update.timer
+  systemd:
+    name: sa-update.timer
+    state: restarted
+    enabled: yes
+
+- name: start exim
+  systemd:
+    name: exim
+    state: restarted
+    enabled: yes
+
+- name: start dovecot
+  systemd:
+    name: dovecot
+    state: restarted
+    enabled: yes
+
+- name: compile sieve
+  shell: sievec /var/lib/dovecot/sieve/default.sieve
+  notify: start dovecot
+
+- name: update SA
+  shell: sudo -u spamd /usr/bin/vendor_perl/sa-update && sudo -u spamd /usr/bin/vendor_perl/sa-compile
+  notify: start SA
+
+- name: start SA
+  systemd:
+    service: spamassassin
+    state: restarted
+    enabled: yes
+
+- name: Create Pubkey
+  shell: openssl rsa -in /etc/mail/dkim_rsa.private -out /dev/stdout -pubout -outform PEM
+  register: dkim_pubkey
+  notify: print dkim
+
+- name: print dkim
+  debug:
+    msg: "DKIM-Selector: {{ dkim_selector }} DKIM-Pubkey: {{ dkim_pubkey.stdout | trim }}"

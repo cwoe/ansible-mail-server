@@ -1,0 +1,7 @@
+#!/bin/sh
+chmod 750 /etc/letsencrypt/live
+chgrp exim /etc/letsencrypt/live
+chmod 750 /etc/letsencrypt/live/{{ hostname }}/fullchain.pem
+chgrp exim /etc/letsencrypt/live/{{ hostname }}/fullchain.pem
+chmod 750 /etc/letsencrypt/live/{{ hostname }}/privkey.pem
+chgrp exim /etc/letsencrypt/live/{{ hostname }}/privkey.pem

@@ -1,0 +1,14 @@
+---
+- name: Copy iptables rules
+  template:
+    src: "iptables.j2"
+    dest: /etc/iptables/iptables.rules
+  notify: apply iptables
+  when: open_ports is defined
+
+- name: Copy ip6tables rules
+  template:
+    src: "ip6tables.j2"
+    dest: /etc/iptables/ip6tables.rules
+  notify: apply ip6tables
+  when: open_ports is defined

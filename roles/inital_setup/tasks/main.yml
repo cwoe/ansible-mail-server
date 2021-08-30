@@ -1,0 +1,77 @@
+---
+- name: Set pre auth message 
+  copy:
+    src: issue.net
+    dest: /etc/issue.net
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart sshd
+
+- name: Ensure Banner is enabled
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^Banner'
+    line: Banner /etc/issue.net
+  notify: restart sshd
+
+- name: Enable group wheel
+  lineinfile:
+    path: /etc/sudoers
+    regexp: '^%wheel ALL=(ALL) NOPASSWD: ALL'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+
+- name: Create users
+  user:
+    name: "{{ item['user'] }}"
+    password: "{{ item['pass'] }}"
+    groups: "{{ item['groups'] }}"
+  loop: "{{ users }}"
+  when: users is defined
+
+- name: Set authorized key
+  ansible.posix.authorized_key:
+    user: "{{ item['user'] }}"
+    key: "{{ item['key'] }}"
+  loop: "{{ ssh_public_keys }}"
+  when: ssh_public_keys is defined
+
+- name: Disable Root Login
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PermitRootLogin'
+    line: PermitRootLogin no
+  notify: restart sshd
+  when: users is defined
+
+- name: Enable Pulic Key Auth
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PubkeyAuthentication'
+    line: PubkeyAuthentication yes
+  notify: restart sshd
+  when: ssh_public_keys is defined
+
+- name: Disable Password Auth
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^PasswordAuthentication'
+    line: PasswordAuthentication no
+  notify: restart sshd
+  when: ssh_public_keys is defined
+
+- name: Install hostname package
+  community.general.pacman:
+    name: inetutils
+    update_cache: yes
+
+- name: Add live hostname
+  hostname:
+    name: "{{ hostname }}"
+
+- name: Add hostname
+  ansible.builtin.copy:
+    content: '{{ hostname }}'
+    dest: /etc/hostname
+
+...

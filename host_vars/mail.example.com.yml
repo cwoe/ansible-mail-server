@@ -1,0 +1,34 @@
+---
+
+hostname: mail.example.com
+addional_ssl_domains:
+  - example.com
+
+open_ports:
+  - port: 22
+    proto: tcp
+    rate_limit:
+      timeout: 120
+      hitcount: 8
+  - port: 25
+    proto: tcp
+    rate_limit:
+      timeout: 120
+      hitcount: 8
+  - port: 80
+    proto: tcp
+  - port: 465
+    proto: tcp
+    rate_limit:
+      timeout: 120
+      hitcount: 8
+  - port: 587
+    proto: tcp
+    rate_limit:
+      timeout: 120
+      hitcount: 8
+  - port: 993
+    proto: tcp
+    rate_limit:
+      timeout: 120
+      hitcount: 8

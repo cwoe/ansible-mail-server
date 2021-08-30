@@ -1,0 +1,10 @@
+---
+
+- name: start certbot-renew.timer
+  systemd:
+    name: certbot-renew.timer
+    state: restarted
+    enabled: yes
+
+- name: fix exim permissions
+  shell: /etc/letsencrypt/renewal-hooks/post/exim.sh

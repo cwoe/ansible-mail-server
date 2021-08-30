@@ -1,0 +1,17 @@
+# Ansible managed
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -p udp --dport 68 -j DROP
+-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+-A INPUT --source 127.0.0.0/8 -j ACCEPT
+-A INPUT -j LOG --log-prefix "[iptables] [INPUT] "
+{% for item in open_ports %}
+{% if item.rate_limit is defined %}
+-A INPUT -p {{ item.proto }} -m {{ item.proto }} --dport {{ item.port }} -m state --state NEW -m recent --set --name {{ item.proto }}{{ item.port }} --mask 255.255.255.255 --rsource 
+-A INPUT -p {{ item.proto }} -m {{ item.proto }} --dport {{ item.port }} -m state --state NEW -m recent --update --seconds {{ item.rate_limit.timeout }} --hitcount {{ item.rate_limit.hitcount }} --rttl --name {{ item.proto }}{{ item.port }} --mask 255.255.255.255 --rsource -j DROP
+{% endif %}
+-A INPUT -p {{ item.proto }} -m {{ item.proto }} --dport {{ item.port }} -m state --state NEW -j ACCEPT
+{% endfor %}
+COMMIT

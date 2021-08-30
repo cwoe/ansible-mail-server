@@ -1,0 +1,8 @@
+---
+- name: Arch Linux VPS Config
+  hosts: all
+  roles:
+    - { role: roles/inital_setup, become: yes }
+    - { role: roles/iptables, become: yes }
+    - { role: roles/sslcert, become: yes }
+    - { role: roles/mailserver, become: yes }
