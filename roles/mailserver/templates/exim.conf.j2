@@ -216,8 +216,7 @@ local_delivery:
 
 dovecot_delivery:
   driver = pipe
-  # You may or may not want to add -d $local_part@$domain depending on if you need a userdb lookup done.
-  command = /usr/lib/dovecot/dovecot-lda -f $sender_address
+  command = /usr/lib/dovecot/dovecot-lda -d ${local_part_data}@${domain_data}
   message_prefix =
   message_suffix =
   log_output
