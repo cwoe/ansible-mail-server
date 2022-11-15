@@ -12,3 +12,5 @@
     dest: /etc/iptables/ip6tables.rules
   notify: apply ip6tables
   when: open_ports is defined
+
+- meta: flush_handlers

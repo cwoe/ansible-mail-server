@@ -1,5 +1,5 @@
 ---
-- name: Arch Linux Mail Server Config
+- name: Ubuntu Linux Mail Server Config
   hosts: all
   roles:
     - { role: roles/inital_setup, become: yes }

@@ -1,9 +1,20 @@
 ---
-- name: Install needed packages
-  community.general.pacman:
+- name: Install snapd
+  apt:
     name:
-      - certbot
+      - snapd
     update_cache: yes
+
+- name: Install certbot
+  community.general.snap:
+    name: certbot
+    classic: true
+
+- name: Create a symbolic link for certbot
+  file:
+    src: /snap/bin/certbot
+    dest: /usr/bin/certbot
+    state: link
 
 - name: Check if a cert already exists
   stat:

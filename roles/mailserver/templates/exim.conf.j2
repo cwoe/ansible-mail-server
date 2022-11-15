@@ -21,7 +21,7 @@ system_filter = /etc/mail/system.filter
 tls_advertise_hosts = *
 tls_certificate = /etc/letsencrypt/live/{{ hostname }}/fullchain.pem
 tls_privatekey = /etc/letsencrypt/live/{{ hostname }}/privkey.pem
-tls_require_ciphers = ECDSA:RSA:!COMPLEMENTOFDEFAULT
+tls_require_ciphers = SECURE256:-VERS-TLS1.0:-VERS-TLS1.1:%SERVER_PRECEDENCE:-AES-256-CBC
 
 daemon_smtp_ports = 25 : 465 : 587
 tls_on_connect_ports = 465
@@ -161,18 +161,15 @@ system_aliases:
   driver = redirect
   allow_fail
   allow_defer
+# TODO lookup full address
   data = ${lookup{$local_part}lsearch{/etc/mail/aliases}}
-# user = exim
   file_transport = address_file
   pipe_transport = address_pipe
 
 userforward:
   driver = redirect
   check_local_user
-# local_part_suffix = +* : -*
-# local_part_suffix_optional
   file = $home/.forward
-# allow_filter
   no_verify
   no_expn
   check_ancestor
@@ -180,11 +177,11 @@ userforward:
   pipe_transport = address_pipe
   reply_transport = address_reply
 
-localuser:
+dovecot:
   driver = accept
-  check_local_user
-  local_part_suffix = +*
-  local_part_suffix_optional
+  domains = +local_domains
+# TODO check if domain_data is set
+  local_parts = dsearch;/var/mail/${domain_data}
   transport = dovecot_delivery
   cannot_route_message = Unknown user
 
@@ -217,14 +214,11 @@ local_delivery:
 dovecot_delivery:
   driver = pipe
   command = /usr/lib/dovecot/dovecot-lda -d ${local_part_data}@${domain_data}
-  message_prefix =
-  message_suffix =
   log_output
   delivery_date_add
   envelope_to_add
   return_path_add
-  #group = mail
-  #mode = 0660
+  user = vmail
   temp_errors = 64 : 69 : 70: 71 : 72 : 73 : 74 : 75 : 78
 
 address_pipe:

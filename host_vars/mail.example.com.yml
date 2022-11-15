@@ -32,3 +32,6 @@ open_ports:
     rate_limit:
       timeout: 120
       hitcount: 8
+mail_users:
+  - user: user@example.com
+    argon2id: '{ARGON2ID}$argon2id$v=19$m=65536,t=3,p=1$salt$hash'

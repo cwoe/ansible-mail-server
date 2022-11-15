@@ -1,5 +1,5 @@
 [Unit]
-Description=Certbot eene timer
+Description=Certbot renew timer
 
 [Timer]
 OnCalendar=weekly
