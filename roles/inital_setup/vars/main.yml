@@ -3,7 +3,7 @@ users:
   - user: user1
     pass: $6$salt2$password
     groups:
-      - wheel
+      - sudoers
 
 ssh_public_keys:
   - user: user1

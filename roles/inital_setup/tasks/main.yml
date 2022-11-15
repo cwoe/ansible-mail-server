@@ -15,11 +15,11 @@
     line: Banner /etc/issue.net
   notify: restart sshd
 
-- name: Enable group wheel
+- name: Enable group sudoers
   lineinfile:
     path: /etc/sudoers
-    regexp: '^%wheel ALL=(ALL) NOPASSWD: ALL'
-    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+    regexp: '^%sudoers ALL=(ALL) NOPASSWD: ALL'
+    line: '%sudoers ALL=(ALL) NOPASSWD: ALL'
 
 - name: Create users
   user:
@@ -59,11 +59,6 @@
     line: PasswordAuthentication no
   notify: restart sshd
   when: ssh_public_keys is defined
-
-- name: Install hostname package
-  community.general.pacman:
-    name: inetutils
-    update_cache: yes
 
 - name: Add live hostname
   hostname:

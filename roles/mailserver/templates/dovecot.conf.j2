@@ -3,20 +3,28 @@ ssl_cert = </etc/letsencrypt/live/{{ hostname }}/fullchain.pem
 ssl_key = </etc/letsencrypt/live/{{ hostname }}/privkey.pem
 
 auth_mechanisms = plain login
-userdb {
-	driver = passwd
-}
 passdb {
-	driver = pam
+	driver = dict
+	args = /etc/dovecot/dovecot-redis.conf
 }
 service auth {
 	unix_listener auth-client {
 		mode = 0660
-		user = exim
+		user = Debian-exim
+	}
+	unix_listener auth-userdb {
+		mode = 0660
+		user = vmail
 	}
 }
 
-mail_location = maildir:/var/mail/%n:INBOX=/var/mail/%n/Inbox:LAYOUT=fs
+mail_uid = vmail
+mail_gid = vmail
+first_valid_uid = 5000
+mail_privileged_group = vmail
+
+mail_home = /var/mail/%d/%n
+mail_location = maildir:~/Mail:INBOX=~/Mail/Inbox:LAYOUT=fs
 namespace inbox {
 	inbox = yes
 	mailbox Drafts {

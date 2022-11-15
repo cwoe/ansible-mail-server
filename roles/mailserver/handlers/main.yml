@@ -19,7 +19,7 @@
 
 - name: start exim
   systemd:
-    name: exim
+    name: exim4
     state: restarted
     enabled: yes
 
@@ -34,7 +34,7 @@
   notify: start dovecot
 
 - name: update SA
-  shell: sudo -u spamd /usr/bin/vendor_perl/sa-update && sudo -u spamd /usr/bin/vendor_perl/sa-compile
+  shell: sudo -u debian-spamd /usr/bin/sa-update && sudo -u debian-spamd /usr/bin/sa-compile
   notify: start SA
 
 - name: start SA
