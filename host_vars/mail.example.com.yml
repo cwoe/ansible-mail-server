@@ -35,3 +35,13 @@ open_ports:
 mail_users:
   - user: user@example.com
     argon2id: '{ARGON2ID}$argon2id$v=19$m=65536,t=3,p=1$salt$hash'
+    aliases:
+      - root@example.com
+      - abuse@example.com
+      - postmaster@example.com
+users:
+  - user: user
+    pass: $6$salt$hash
+    groups:
+      - sudoers
+    ssh_key: ssh-rsa pubkey chris@desktop

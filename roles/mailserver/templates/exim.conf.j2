@@ -161,10 +161,9 @@ system_aliases:
   driver = redirect
   allow_fail
   allow_defer
-# TODO lookup full address
-  data = ${lookup{$local_part}lsearch{/etc/mail/aliases}}
-  file_transport = address_file
-  pipe_transport = address_pipe
+  domains = +local_domains
+  data = ${lookup{$local_part@$domain_data}lsearch{/etc/mail/aliases}}
+  pipe_transport = dovecot_delivery
 
 userforward:
   driver = redirect
@@ -180,7 +179,6 @@ userforward:
 dovecot:
   driver = accept
   domains = +local_domains
-# TODO check if domain_data is set
   local_parts = dsearch;/var/mail/${domain_data}
   transport = dovecot_delivery
   cannot_route_message = Unknown user

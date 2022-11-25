@@ -1,4 +1,9 @@
 ---
+- name: Create iptables directory
+  file:
+    path: /etc/iptables
+    state: directory
+
 - name: Copy iptables rules
   template:
     src: "iptables.j2"
@@ -13,4 +18,31 @@
   notify: apply ip6tables
   when: open_ports is defined
 
+- name: Create Unit file for iptables
+  copy:
+    src: iptables.service
+    dest: /etc/systemd/system/iptables.service
+  notify:
+    - reload systemd
+
+- name: Create Unit file for ip6tables
+  copy:
+    src: ip6tables.service
+    dest: /etc/systemd/system/ip6tables.service
+  notify:
+    - reload systemd
+
 - meta: flush_handlers
+
+- name: Enable iptables service
+  service:
+    name: iptables
+    enabled: yes
+  when: open_ports is defined
+
+- name: Enable ip6tables service
+  service:
+    name: ip6tables
+    enabled: yes
+  when: open_ports is defined
+

@@ -15,6 +15,11 @@
     line: Banner /etc/issue.net
   notify: restart sshd
 
+- name: create sudoers group
+  group:
+    name: sudoers
+    state: present
+
 - name: Enable group sudoers
   lineinfile:
     path: /etc/sudoers
@@ -32,9 +37,9 @@
 - name: Set authorized key
   ansible.posix.authorized_key:
     user: "{{ item['user'] }}"
-    key: "{{ item['key'] }}"
-  loop: "{{ ssh_public_keys }}"
-  when: ssh_public_keys is defined
+    key: "{{ item['ssh_key'] }}"
+  loop: "{{ users }}"
+  when: users is defined
 
 - name: Disable Root Login
   lineinfile:
@@ -50,7 +55,7 @@
     regexp: '^PubkeyAuthentication'
     line: PubkeyAuthentication yes
   notify: restart sshd
-  when: ssh_public_keys is defined
+  when: users is defined
 
 - name: Disable Password Auth
   lineinfile:
@@ -58,7 +63,7 @@
     regexp: '^PasswordAuthentication'
     line: PasswordAuthentication no
   notify: restart sshd
-  when: ssh_public_keys is defined
+  when: users is defined
 
 - name: Add live hostname
   hostname:
