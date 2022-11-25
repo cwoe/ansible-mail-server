@@ -1,7 +1,6 @@
-# Ansible Playbook for Setting up a Working Mail Server on Ubuntu 22
+# Ansible Playbook for Setting up a Working Mail Server on Ubuntu 22.04
 
-Tested and working on Ubuntu 22.03 provisioned on Oracle Cloud.
-Will test with stock Ubuntu once I get the time.
+Tested and working on Ubuntu 22.04.
 
 ## Features
 
@@ -19,6 +18,4 @@ Will test with stock Ubuntu once I get the time.
 
 ## TODOs
 
-- Test vs stock Ubuntu
-- Rework the inital_setup role
-- Write a small how-to
+- Expand documentation
