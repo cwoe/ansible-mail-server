@@ -3,8 +3,8 @@
 ######################################################################
 
 primary_hostname = {{ hostname }}
+domainlist local_domains = {{ local_domains[0] }}{% for domain in local_domains[1:]%}:{{domain}}{% endfor %}
 
-domainlist local_domains = {{ hostname.split('.')[1:] | join('.') }}
 domainlist relay_to_domains =
 hostlist   relay_from_hosts = localhost : 127.0.0.0/8
 

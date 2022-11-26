@@ -3,7 +3,8 @@
 hostname: mail.example.com
 addional_ssl_domains:
   - example.com
-
+local_domains:
+  - example.com
 open_ports:
   - port: 22
     proto: tcp
