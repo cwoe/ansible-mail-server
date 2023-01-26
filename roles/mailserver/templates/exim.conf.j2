@@ -78,7 +78,7 @@ acl_check_rcpt:
           logwrite      = REJECT [$sender_host_address]: bad recipient count high [${eval:$rcpt_count-$recipients_count}]
 
   accept  hosts         = +relay_from_hosts
-          control       = submission
+          control       = submission/sender_retain
           control       = dkim_disable_verify
 
   accept  authenticated = *
