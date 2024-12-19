@@ -7,3 +7,4 @@ chmod 644 /etc/letsencrypt/live/{{ hostname }}/fullchain.pem
 chown root:Debian-exim /etc/letsencrypt/live/{{ hostname }}/fullchain.pem
 chmod 650 /etc/letsencrypt/live/{{ hostname }}/privkey.pem
 chown root:Debian-exim /etc/letsencrypt/live/{{ hostname }}/privkey.pem
+systemctl restart exim4
